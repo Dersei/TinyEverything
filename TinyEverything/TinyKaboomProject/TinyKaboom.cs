@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
 using TinyEverything.Common;
 using static TinyEverything.Common.Utilities;
@@ -102,17 +100,16 @@ namespace TinyEverything.TinyKaboomProject
                  }
              });
 
-            var fileName = $"output-C#{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}.ppm";
-            using var fileStream = File.Open(fileName, FileMode.CreateNew, FileAccess.Write);
-            using var writer = new BinaryWriter(fileStream, Encoding.ASCII);
-            writer.Write(Encoding.ASCII.GetBytes($"P6 {width} {height} 255 ")); // trailing space!!!
+            var fileName = $"output-kaboom{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}.ppm";
 
-            for (var i = 0; i < height * width; ++i)
+            var image = new Image(fileName)
             {
-                writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * framebuffer[i].X)))));
-                writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * framebuffer[i].Y)))));
-                writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * framebuffer[i].Z)))));
-            }
+                Height = height,
+                Width = width,
+                Data = framebuffer
+            };
+
+            ImageSaver.Save(image);
         }
     }
 }
