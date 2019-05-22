@@ -4,7 +4,7 @@ using TinyEverything.Common;
 
 namespace TinyEverything.TinyKaboomProject
 {
-    internal class NoiseGenerator
+    public class NoiseGenerator
     {
         public float HashValue { get; set; } = 43758.5453f;
 

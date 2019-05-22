@@ -1,10 +1,10 @@
 ﻿using TinyEverything.TinyKaboomProject;
 
-namespace TinyEverything
+namespace TinyEverything.ConsoleRunner
 {
     internal class Program
     {
-        private static void Main()
+        private static void Main(string[] args)
         {
             new TinyKaboom().Run();
         }

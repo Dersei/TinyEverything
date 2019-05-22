@@ -7,7 +7,7 @@ using static TinyEverything.Common.Utilities;
 
 namespace TinyEverything.TinyKaboomProject
 {
-    internal class TinyKaboom
+    public class TinyKaboom
     {
         public float SphereRadius { set; get; }
         public float NoiseAmplitude { set; get; }
