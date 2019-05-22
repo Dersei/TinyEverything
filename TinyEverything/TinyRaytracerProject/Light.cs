@@ -2,10 +2,10 @@
 
 namespace TinyEverything.TinyRaytracerProject
 {
-    public struct Light
+    public readonly struct Light
     {
-        public Vector3 Position { get; }
-        public float Intensity { get; }
+        public readonly Vector3 Position;
+        public readonly float Intensity;
 
         public Light(Vector3 position, float intensity)
         {

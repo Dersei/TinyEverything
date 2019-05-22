@@ -7,7 +7,7 @@ namespace TinyEverything.ConsoleRunner
     {
         private static void Main(string[] args)
         {
-            new TinyRaytracer().Run();
+            new TinyRaytracer().DefaultSettings().Run();
         }
     }
 }

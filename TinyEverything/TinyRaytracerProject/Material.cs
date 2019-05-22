@@ -2,12 +2,20 @@
 
 namespace TinyEverything.TinyRaytracerProject
 {
-    public struct Material
+    public readonly struct Material
     {
-        public Vector3 DiffuseColor { get; set; }
-        public Vector4 Albedo { get; }
-        public float SpecularExponent { get; }
-        public float RefractiveIndex { get; }
+        public readonly Vector3 DiffuseColor;
+        public readonly Vector4 Albedo;
+        public readonly float SpecularExponent;
+        public readonly float RefractiveIndex;
+
+        public Material(Vector3 diffuseColor)
+        {
+            DiffuseColor = diffuseColor;
+            Albedo = new Vector4(1, 0, 0, 0);
+            SpecularExponent = 0;
+            RefractiveIndex = 1;
+        }
 
         public Material(Vector3 diffuseColor, Vector4 albedo, float specularExponent = 0, float refractiveIndex = 1)
         {

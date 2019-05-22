@@ -3,11 +3,11 @@ using System.Numerics;
 
 namespace TinyEverything.TinyRaytracerProject
 {
-    internal struct Sphere
+    public readonly struct Sphere
     {
-        public Vector3 Center { get; }
-        public float Radius { get; }
-        public Material Material { get; }
+        public readonly Vector3 Center;
+        public readonly float Radius;
+        public readonly Material Material;
 
         public Sphere(Vector3 center, float radius, Material material)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using static TinyEverything.Common.Utilities;
 
 namespace TinyEverything.TinyKaboomProject
@@ -8,6 +9,7 @@ namespace TinyEverything.TinyKaboomProject
     {
         public float HashValue { get; set; } = 43758.5453f;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private float Hash(float n)
         {
             var x = MathF.Sin(n) * HashValue;
