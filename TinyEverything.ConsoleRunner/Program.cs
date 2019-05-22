@@ -1,4 +1,5 @@
 ﻿using TinyEverything.TinyKaboomProject;
+using TinyEverything.TinyRaytracerProject;
 
 namespace TinyEverything.ConsoleRunner
 {
@@ -6,7 +7,7 @@ namespace TinyEverything.ConsoleRunner
     {
         private static void Main(string[] args)
         {
-            new TinyKaboom().Run();
+            new TinyRaytracer().Run();
         }
     }
 }
