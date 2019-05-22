@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Numerics;
 using System.Text;
 
 namespace TinyEverything.Common
@@ -20,6 +21,12 @@ namespace TinyEverything.Common
 
             for (var i = 0; i < image.Height * image.Width; ++i)
             {
+                var c = image.Data![i];
+                var max = MathF.Max(c.X, MathF.Max(c.Y, c.Z));
+                if (max > 1)
+                {
+                    image.Data![i] = c * (1.0f / max);
+                }
                 writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * image.Data![i].X)))));
                 writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * image.Data[i].Y)))));
                 writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * image.Data[i].Z)))));

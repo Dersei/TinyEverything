@@ -7,11 +7,13 @@ namespace TinyEverything.TinyRaytracerProject
     {
         public Vector3 Center { get; }
         public float Radius { get; }
+        public Material Material { get; }
 
-        public Sphere(Vector3 c, float r)
+        public Sphere(Vector3 center, float radius, Material material)
         {
-            Center = c;
-            Radius = r;
+            Center = center;
+            Radius = radius;
+            Material = material;
         }
 
         public bool IsRayIntersecting(Vector3 origin, Vector3 direction, ref float distance)
