@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using TinyEverything.Common;
+using static TinyEverything.Common.Utilities;
 
 namespace TinyEverything.TinyKaboomProject
 {
@@ -13,25 +13,25 @@ namespace TinyEverything.TinyKaboomProject
             var x = MathF.Sin(n) * HashValue;
             return x - MathF.Floor(x);
         }
-
+        
         private float Noise(Vector3 x)
         {
             var p = new Vector3(MathF.Floor(x.X), MathF.Floor(x.Y), MathF.Floor(x.Z));
             var f = new Vector3(x.X - p.X, x.Y - p.Y, x.Z - p.Z);
 
             f *= (f * (new Vector3(3.0f, 3.0f, 3.0f) - f * 2.0f));
-            var n = Utilities.Floatify(p, new Vector3(1.0f, 57.0f, 113.0f));
-            return Utilities.Lerp(Utilities.Lerp(
-                    Utilities.Lerp(Hash(n + 0.0f), Hash(n + 1.0f), f.X),
-                    Utilities.Lerp(Hash(n + 57.0f), Hash(n + 58.0f), f.X), f.Y),
-                Utilities.Lerp(
-                    Utilities.Lerp(Hash(n + 113.0f), Hash(n + 114.0f), f.X),
-                    Utilities.Lerp(Hash(n + 170.0f), Hash(n + 171.0f), f.X), f.Y), f.Z);
+            var n = Vector3.Dot(p, new Vector3(1.0f, 57.0f, 113.0f));
+            return Lerp(Lerp(
+                    Lerp(Hash(n + 0.0f), Hash(n + 1.0f), f.X),
+                    Lerp(Hash(n + 57.0f), Hash(n + 58.0f), f.X), f.Y),
+                Lerp(
+                    Lerp(Hash(n + 113.0f), Hash(n + 114.0f), f.X),
+                    Lerp(Hash(n + 170.0f), Hash(n + 171.0f), f.X), f.Y), f.Z);
         }
 
         internal float FractalBrownianMotion(Vector3 x)
         {
-            var p = Utilities.Rotate(x);
+            var p = Rotate(x);
             float f = 0;
             f += 0.5000f * Noise(p);
             p *= 2.32f;

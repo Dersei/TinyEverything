@@ -20,7 +20,7 @@ namespace TinyEverything.Common
 
             for (var i = 0; i < image.Height * image.Width; ++i)
             {
-                writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * image.Data[i].X)))));
+                writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * image.Data![i].X)))));
                 writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * image.Data[i].Y)))));
                 writer.Write((byte)(MathF.Max(0, MathF.Min(255, (int)(255 * image.Data[i].Z)))));
             }

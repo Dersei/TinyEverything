@@ -45,18 +45,18 @@ namespace TinyEverything.TinyKaboomProject
 
             var x = MathF.Max(0.0f, MathF.Min(1.0f, d));
             if (x < .25f)
-                return Lerp(gray, darkGray, x * 4.0f);
+                return Vector3.Lerp(gray, darkGray, x * 4.0f);
             if (x < .5f)
-                return Lerp(darkGray, red, x * 4.0f - 1.0f);
+                return Vector3.Lerp(darkGray, red, x * 4.0f - 1.0f);
             if (x < .75f)
-                return Lerp(red, orange, x * 4.0f - 2.0f);
+                return Vector3.Lerp(red, orange, x * 4.0f - 2.0f);
 
-            return Lerp(orange, yellow, x * 4.0f - 3.0f);
+            return Vector3.Lerp(orange, yellow, x * 4.0f - 3.0f);
         }
 
         private bool SphereTrace(Vector3 orig, Vector3 dir, out Vector3 pos)
         {
-            if (Floatify(orig, orig) - MathF.Pow(Floatify(orig, dir), 2) > MathF.Pow(SphereRadius, 2))
+            if (Vector3.Dot(orig, orig) - MathF.Pow(Vector3.Dot(orig, dir), 2) > MathF.Pow(SphereRadius, 2))
             {
                 pos = default;
                 return false;
@@ -90,7 +90,7 @@ namespace TinyEverything.TinyKaboomProject
                      { // the camera is placed to (0,0,3) and it looks along the -z axis
                          var noiseLevel = (SphereRadius - hit.Length()) / NoiseAmplitude;
                          var lightDir = (new Vector3(10, 10, 10) - hit).Normalize();
-                         var lightIntensity = MathF.Max(0.4f, Floatify(lightDir, DistanceFieldNormal(hit)));
+                         var lightIntensity = MathF.Max(0.4f, Vector3.Dot(lightDir, DistanceFieldNormal(hit)));
                          framebuffer[i + j * width] = FirePalette((-0.2f + noiseLevel) * 2) * lightIntensity;
                      }
                      else
