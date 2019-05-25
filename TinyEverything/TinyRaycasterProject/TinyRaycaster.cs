@@ -31,7 +31,7 @@ namespace TinyEverything.TinyRaycasterProject
                 {
                     var cx = x + i;
                     var cy = y + j;
-                    Debug.Assert(cx < imgW && cy < imgH);
+                    if (cx >= imgW || cy >= imgH) continue;
                     img[cx + cy * imgW] = color;
                 }
             }
@@ -57,67 +57,83 @@ namespace TinyEverything.TinyRaycasterProject
         "0              0" +
         "0002222222200000").ToCharArray();
 
+        private readonly Random _random = new Random();
+        private readonly string _directoryName = $"dir-{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}";
         public void Run()
         {
-            const int width = 512; // image width
+            Directory.CreateDirectory(_directoryName);
+            const int width = 1024; // image width
             const int height = 512; // image height
-            var framebuffer = Enumerable.Repeat(255u, height * width).ToList();
 
             var player_x = 3.456f; // player x position
             var player_y = 2.345f; // player y position
             var player_a = 1.523f;
             const float fov = MathF.PI / 3.0f;
 
-            for (var j = 0; j < height; j++)
-            { // fill the screen with color gradients
-                for (var i = 0; i < width; i++)
-                {
-                    var r = (byte)(255 * (j / (float)height)); // varies between 0 and 255 as j sweeps the vertical
-                    var g = (byte)(255 * (i / (float)width)); // varies between 0 and 255 as i sweeps the horizontal
-                    byte b = 0;
-                    framebuffer[i + j * width] = PackColor(r, g, b);
-                }
+            const int ncolors = 10;
+            uint[] colors = new uint[ncolors];
+            for (int i = 0; i < ncolors; i++)
+            {
+                colors[i] = PackColor((byte)_random.Next(0, 255), (byte)_random.Next(0, 255), (byte)_random.Next(0, 255));
             }
 
-            const int rectW = width / MapWidth;
+            const int rectW = width / (MapWidth * 2);
             const int rectH = height / MapHeight;
-            for (var j = 0; j < MapHeight; j++)
-            { // draw the map
-                for (var i = 0; i < MapWidth; i++)
-                {
-                    if (_map[i + j * MapWidth] == ' ') continue; // skip empty spaces
-                    var rectX = i * rectW;
-                    var rectY = j * rectH;
-                    DrawRectangle(framebuffer, width, height, rectX, rectY, rectW, rectH, PackColor(0, 255, 255));
+            for (int frame = 0; frame < 360; frame++)
+            {
+                player_a += 2 * MathF.PI / 360f;
+                var framebuffer = Enumerable.Repeat(PackColor(255, 255, 255), height * width).ToList();
+
+                for (var j = 0; j < MapHeight; j++)
+                { // draw the map
+                    for (var i = 0; i < MapWidth; i++)
+                    {
+                        if (_map[i + j * MapWidth] == ' ') continue; // skip empty spaces
+                        var rectX = i * rectW;
+                        var rectY = j * rectH;
+                        var icolor = _map[i + j * MapWidth] - '0';
+                        Debug.Assert(icolor < ncolors);
+                        DrawRectangle(framebuffer, width, height, rectX, rectY, rectW, rectH, colors[icolor]);
+                    }
                 }
+
+                for (int i = 0; i < width / 2; i++)
+                {
+                    // draw the visibility cone AND the "3D" view
+                    float angle = player_a - fov / 2 + fov * i / ((float)width / 2);
+                    for (float t = 0; t < 20; t += 0.01f)
+                    {
+                        float cx = player_x + t * MathF.Cos(angle);
+                        float cy = player_y + t * MathF.Sin(angle);
+
+                        int pix_x = (int)(cx * rectW);
+                        int pix_y = (int)(cy * rectH);
+                        framebuffer[pix_x + pix_y * width] = PackColor(160, 160, 160); // this draws the visibility cone
+
+                        if (_map[(int)(cx) + (int)(cy) * MapWidth] != ' ')
+                        {
+                            int icolor = _map[(int)cx + (int)cy * MapWidth] - '0';
+                            Debug.Assert(icolor < ncolors);
+                            // our ray touches a wall, so draw the vertical column to create an illusion of 3D
+                            int column_height = (int)(height / (t * MathF.Cos(angle - player_a)));
+                            DrawRectangle(framebuffer, width, height, width / 2 + i, height / 2 - column_height / 2, 1,
+                                column_height, colors[icolor]);
+                            break;
+                        }
+                    }
+                }
+
+                var fileName = $"{frame}.ppm";
+
+                Save(fileName, height, width, framebuffer);
             }
 
-            DrawRectangle(framebuffer, width, height, (int)(player_x * rectW), (int)(player_y * rectH), 5, 5, PackColor(255, 255, 255));
 
-            for (int i = 0; i < width; i++)
-            { // draw the visibility cone
-                float angle = player_a - fov / 2 + fov * i / (float)width;
-
-                for (float t = 0; t < 20; t += 0.05f)
-                {
-                    float cx = player_x + t * MathF.Cos(angle);
-                    float cy = player_y + t * MathF.Sin(angle);
-                    if (_map[(int)cx + (int)cy * MapWidth] != ' ') break;
-
-                    int pix_x = (int)(cx * rectW);
-                    int pix_y = (int)(cy * rectH);
-                    framebuffer[pix_x + pix_y * width] = PackColor(255, 255, 255);
-                }
-            }
-
-            Save(height, width, framebuffer);
         }
 
-        public void Save(int height, int width, List<uint> data)
+        public void Save(string fileName, int height, int width, List<uint> data)
         {
-            var fileName = $"output-raycaster{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}.ppm";
-
-            using var fileStream = File.Open(fileName, FileMode.CreateNew, FileAccess.Write);
+            using var fileStream = File.Open($"{_directoryName}\\{fileName}", FileMode.CreateNew, FileAccess.Write);
             using var writer = new BinaryWriter(fileStream, Encoding.ASCII);
             writer.Write(Encoding.ASCII.GetBytes($"P6 {width} {height} 255 ")); // trailing space!!!
 
