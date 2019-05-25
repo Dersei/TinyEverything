@@ -4,11 +4,36 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using StbSharp;
 
 namespace TinyEverything.TinyRaycasterProject
 {
     public class TinyRaycaster
     {
+        private bool LoadTexture(string filename, out List<uint> texture, out int textSize, out int textCount)
+        {
+            ImageReader loader = new ImageReader();
+            using Stream stream = File.Open(filename, FileMode.Open);
+            Image image = loader.Read(stream, StbImage.STBI_rgb_alpha);
+            byte[] data = image.Data;
+
+            textCount = image.Width / image.Height;
+            textSize = image.Width / textCount;
+            texture = Enumerable.Repeat(0u, image.Width * image.Height).ToList();
+            for (int j = 0; j < image.Height; j++)
+            {
+                for (int i = 0; i < image.Width; i++)
+                {
+                    byte r = data[(i + j * image.Width) * 4 + 0];
+                    byte g = data[(i + j * image.Width) * 4 + 1];
+                    byte b = data[(i + j * image.Width) * 4 + 2];
+                    byte a = data[(i + j * image.Width) * 4 + 3];
+                    texture[i + j * image.Width] = PackColor(r, g, b, a);
+                }
+            }
+            return true;
+        }
+
         private uint PackColor(byte r, byte g, byte b, byte a = 255)
         {
             return (((uint)a << 24) + ((uint)b << 16) + ((uint)g << 8) + r);
