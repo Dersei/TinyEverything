@@ -10,41 +10,40 @@ namespace TinyEverything.TinyRaycasterProject
 {
     public class TinyRaycaster
     {
-        private bool LoadTexture(string filename, out List<uint> texture, out int textSize, out int textCount)
+        private void LoadTexture(string filename, out List<uint> texture, out int textSize, out int textCount)
         {
-            ImageReader loader = new ImageReader();
+            var loader = new ImageReader();
             using Stream stream = File.Open(filename, FileMode.Open);
-            Image image = loader.Read(stream, StbImage.STBI_rgb_alpha);
-            byte[] data = image.Data;
+            var image = loader.Read(stream, StbImage.STBI_rgb_alpha);
+            var data = image.Data;
 
             textCount = image.Width / image.Height;
             textSize = image.Width / textCount;
             texture = Enumerable.Repeat(0u, image.Width * image.Height).ToList();
-            for (int j = 0; j < image.Height; j++)
+            for (var j = 0; j < image.Height; j++)
             {
-                for (int i = 0; i < image.Width; i++)
+                for (var i = 0; i < image.Width; i++)
                 {
-                    byte r = data[(i + j * image.Width) * 4 + 0];
-                    byte g = data[(i + j * image.Width) * 4 + 1];
-                    byte b = data[(i + j * image.Width) * 4 + 2];
-                    byte a = data[(i + j * image.Width) * 4 + 3];
+                    var r = data[(i + j * image.Width) * 4 + 0];
+                    var g = data[(i + j * image.Width) * 4 + 1];
+                    var b = data[(i + j * image.Width) * 4 + 2];
+                    var a = data[(i + j * image.Width) * 4 + 3];
                     texture[i + j * image.Width] = PackColor(r, g, b, a);
                 }
             }
-            return true;
         }
 
-        List<uint> TextureColumn(List<uint> img, int texsize, int ntextures, int texid, int texcoord, int column_height)
+        private List<uint> TextureColumn(List<uint> img, int textureSize, int nTextures, int textureId, int textureCoord, int columnHeight)
         {
-            int img_w = texsize * ntextures;
-            int img_h = texsize;
+            var imageWidth = textureSize * nTextures;
+            var imageHeight = textureSize;
 
-            List<uint> column = Enumerable.Repeat(0u, column_height).ToList();
-            for (int y = 0; y < column_height; y++)
+            var column = Enumerable.Repeat(0u, columnHeight).ToList();
+            for (var y = 0; y < columnHeight; y++)
             {
-                int pix_x = texid * texsize + texcoord;
-                int pix_y = (y * texsize) / column_height;
-                column[y] = img[pix_x + pix_y * img_w];
+                var pixX = textureId * textureSize + textureCoord;
+                var pixY = (y * textureSize) / columnHeight;
+                column[y] = img[pixX + pixY * imageWidth];
             }
             return column;
         }
@@ -101,29 +100,29 @@ namespace TinyEverything.TinyRaycasterProject
         private readonly string _directoryName = $"dir-{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}";
         public void Run()
         {
-            LoadTexture("Resources/walltext.png", out var walltext, out var walltext_size, out var walltext_count);
+            LoadTexture("Resources/walltext.png", out var wallTexture, out var wallTextureSize, out var wallTextureCount);
 
             Directory.CreateDirectory(_directoryName);
             const int width = 1024; // image width
             const int height = 512; // image height
 
-            var player_x = 3.456f; // player x position
-            var player_y = 2.345f; // player y position
-            var player_a = 1.523f;
+            const float playerX = 3.456f; // player x position
+            const float playerY = 2.345f; // player y position
+            var playerA = 1.523f;
             const float fov = MathF.PI / 3.0f;
 
-            const int ncolors = 10;
-            uint[] colors = new uint[ncolors];
-            for (int i = 0; i < ncolors; i++)
+            const int nColors = 10;
+            var colors = new uint[nColors];
+            for (var i = 0; i < nColors; i++)
             {
                 colors[i] = PackColor((byte)_random.Next(0, 255), (byte)_random.Next(0, 255), (byte)_random.Next(0, 255));
             }
 
             const int rectW = width / (MapWidth * 2);
             const int rectH = height / MapHeight;
-            for (int frame = 0; frame < 360; frame++)
+            for (var frame = 0; frame < 360; frame++)
             {
-                player_a += 2 * MathF.PI / 360f;
+                playerA += 2 * MathF.PI / 360f;
                 var framebuffer = Enumerable.Repeat(PackColor(255, 255, 255), height * width).ToList();
 
                 for (var j = 0; j < MapHeight; j++)
@@ -133,49 +132,52 @@ namespace TinyEverything.TinyRaycasterProject
                         if (_map[i + j * MapWidth] == ' ') continue; // skip empty spaces
                         var rectX = i * rectW;
                         var rectY = j * rectH;
-                        var texid = _map[i + j * MapWidth] - '0';
-                        Debug.Assert(texid < walltext_count);
-                        DrawRectangle(framebuffer, width, height, rectX, rectY, rectW, rectH, walltext[texid * walltext_size]);
+                        var textureId = _map[i + j * MapWidth] - '0';
+                        Debug.Assert(textureId < wallTextureCount);
+                        DrawRectangle(framebuffer, width, height, rectX, rectY, rectW, rectH, wallTexture[textureId * wallTextureSize]);
                     }
                 }
 
-                for (int i = 0; i < width / 2; i++)
+                for (var i = 0; i < width / 2; i++)
                 {
                     // draw the visibility cone AND the "3D" view
-                    float angle = player_a - fov / 2 + fov * i / ((float)width / 2);
+                    var angle = playerA - fov / 2 + fov * i / ((float)width / 2);
                     for (float t = 0; t < 20; t += 0.01f)
                     {
-                        float cx = player_x + t * MathF.Cos(angle);
-                        float cy = player_y + t * MathF.Sin(angle);
+                        var cx = playerX + t * MathF.Cos(angle);
+                        var cy = playerY + t * MathF.Sin(angle);
 
-                        int pix_x = (int)(cx * rectW);
-                        int pix_y = (int)(cy * rectH);
-                        framebuffer[pix_x + pix_y * width] = PackColor(160, 160, 160); // this draws the visibility cone
+                        var pixX = (int)(cx * rectW);
+                        var pixY = (int)(cy * rectH);
+                        framebuffer[pixX + pixY * width] = PackColor(160, 160, 160); // this draws the visibility cone
 
                         if (_map[(int)(cx) + (int)(cy) * MapWidth] != ' ')
                         {
-                            int texid = _map[(int)cx + (int)cy * MapWidth] - '0';
-                            Debug.Assert(texid < walltext_count);
+                            var textureId = _map[(int)cx + (int)cy * MapWidth] - '0';
+                            Debug.Assert(textureId < wallTextureCount);
                             // our ray touches a wall, so draw the vertical column to create an illusion of 3D
-                            int column_height = (int)(height / (t * MathF.Cos(angle - player_a)));
-                            float hitx = cx - MathF.Floor(cx + 0.5f); // hitx and hity contain (signed) fractional parts of cx and cy,
-                            float hity = cy - MathF.Floor(cy + 0.5f); // they vary between -0.5 and +0.5, and one of them is supposed to be very close to 0
-                            int x_texcoord = (int)(hitx * walltext_size);
-                            if (MathF.Abs(hity) > MathF.Abs(hitx))
+                            var columnHeight = (int)(height / (t * MathF.Cos(angle - playerA)));
+                            var hitX = cx - MathF.Floor(cx + 0.5f); // hitx and hity contain (signed) fractional parts of cx and cy,
+                            var hitY = cy - MathF.Floor(cy + 0.5f); // they vary between -0.5 and +0.5, and one of them is supposed to be very close to 0
+                            var xTextureCoord = (int)(hitX * wallTextureSize);
+                            if (MathF.Abs(hitY) > MathF.Abs(hitX))
                             {
-                                x_texcoord = (int)(hity * walltext_size);
+                                xTextureCoord = (int)(hitY * wallTextureSize);
                             }
 
-                            if (x_texcoord < 0) x_texcoord += walltext_size; // do not forget x_texcoord can be negative, fix that
-                            Debug.Assert(x_texcoord >= 0 && x_texcoord < (int)walltext_size);
-
-                            List<uint> column = TextureColumn(walltext, walltext_size, walltext_count, texid, x_texcoord, column_height);
-                            pix_x = width / 2 + i;
-                            for (var j = 0; j < column_height; j++)
+                            if (xTextureCoord < 0)
                             {
-                                pix_y = j + height / 2 - column_height / 2;
-                                if (pix_y < 0 || pix_y >= (int)height) continue;
-                                framebuffer[pix_x + pix_y * width] = column[j];
+                                xTextureCoord += wallTextureSize; // do not forget x_texcoord can be negative, fix that
+                            }
+                            Debug.Assert(xTextureCoord >= 0 && xTextureCoord < wallTextureSize);
+
+                            var column = TextureColumn(wallTexture, wallTextureSize, wallTextureCount, textureId, xTextureCoord, columnHeight);
+                            pixX = width / 2 + i;
+                            for (var j = 0; j < columnHeight; j++)
+                            {
+                                pixY = j + height / 2 - columnHeight / 2;
+                                if (pixY < 0 || pixY >= height) continue;
+                                framebuffer[pixX + pixY * width] = column[j];
                             }
                             break;
                         }
