@@ -33,7 +33,7 @@ namespace TinyEverything.Common
                     Faces.Add(new Vector<int>(array));
                 }
             }
-            GetBbox(new Vector3(), new Vector3());
+            //GetBbox(new Vector3(), new Vector3());
 
         }
 
@@ -57,7 +57,7 @@ namespace TinyEverything.Common
             return tnear > 1e-5;
         }
 
-        private void GetBbox(Vector3 min, Vector3 max)
+        private void GetBbox(ref Vector3 min, ref Vector3 max)
         {
             min = max = Vertices[0];
             for (var i = 1; i < Vertices.Count; ++i)
