@@ -63,6 +63,11 @@ namespace TinyEverything.TinyRaycasterProject
             const int height = 512; // image height
             var framebuffer = Enumerable.Repeat(255u, height * width).ToList();
 
+            var player_x = 3.456f; // player x position
+            var player_y = 2.345f; // player y position
+            var player_a = 1.523f;
+            const float fov = MathF.PI / 3.0f;
+
             for (var j = 0; j < height; j++)
             { // fill the screen with color gradients
                 for (var i = 0; i < width; i++)
@@ -84,6 +89,24 @@ namespace TinyEverything.TinyRaycasterProject
                     var rectX = i * rectW;
                     var rectY = j * rectH;
                     DrawRectangle(framebuffer, width, height, rectX, rectY, rectW, rectH, PackColor(0, 255, 255));
+                }
+            }
+
+            DrawRectangle(framebuffer, width, height, (int)(player_x * rectW), (int)(player_y * rectH), 5, 5, PackColor(255, 255, 255));
+
+            for (int i = 0; i < width; i++)
+            { // draw the visibility cone
+                float angle = player_a - fov / 2 + fov * i / (float)width;
+
+                for (float t = 0; t < 20; t += 0.05f)
+                {
+                    float cx = player_x + t * MathF.Cos(angle);
+                    float cy = player_y + t * MathF.Sin(angle);
+                    if (_map[(int)cx + (int)cy * MapWidth] != ' ') break;
+
+                    int pix_x = (int)(cx * rectW);
+                    int pix_y = (int)(cy * rectH);
+                    framebuffer[pix_x + pix_y * width] = PackColor(255, 255, 255);
                 }
             }
 
