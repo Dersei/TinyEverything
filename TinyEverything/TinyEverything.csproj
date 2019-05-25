@@ -13,4 +13,10 @@
     <PackageReference Include="StbSharp" Version="0.7.2.38" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\walltext.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
