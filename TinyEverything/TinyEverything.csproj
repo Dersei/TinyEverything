@@ -14,6 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\monsters.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\walltext.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
