@@ -154,7 +154,7 @@ namespace TinyEverything.TinyRaytracerProject
             const int width = 1024;
             const int height = 768;
             const int fov = (int)(MathF.PI / 2.0f);
-            var framebuffer = Enumerable.Repeat(default(Vector3), height * width).ToList();
+            var framebuffer = new Framebuffer<Vector3>(width, height, default);
 
             Parallel.For(0, height, j =>
             {

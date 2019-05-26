@@ -7,7 +7,7 @@ namespace TinyEverything.Common
     {
         public int Height { get; set; }
         public int Width { get; set; }
-        public List<Vector3>? Data { get; set; }
+        public Framebuffer<Vector3>? Data { get; set; }
         public string Name { get; set; }
 
         public Image(string name)

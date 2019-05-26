@@ -76,7 +76,7 @@ namespace TinyEverything.TinyKaboomProject
             const int width = 640;
             const int height = 480;
             const float fov = MathF.PI / 3.0f;
-            var framebuffer = Enumerable.Repeat(default(Vector3), height * width).ToList();
+            var framebuffer = new Framebuffer<Vector3>(width, height, default);
 
             Parallel.For(0, height, j =>
              {
