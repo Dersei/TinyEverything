@@ -1,6 +1,6 @@
 ﻿namespace TinyEverything.TinyRaycasterProject
 {
-    internal class Sprite
+    public class Sprite
     {
         public float X;
         public float Y;

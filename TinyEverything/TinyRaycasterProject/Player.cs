@@ -1,6 +1,6 @@
 ﻿namespace TinyEverything.TinyRaycasterProject
 {
-    internal class Player
+    public class Player
     {
         public float X;
         public float Y;

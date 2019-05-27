@@ -9,18 +9,18 @@ namespace TinyEverything.TinyRaycasterProject
 {
     public class TinyRaycaster
     {
-        private readonly Map _map = new Map();
-        private readonly Player _player = new Player();
-        private readonly Framebuffer<uint> _framebuffer = new Framebuffer<uint>(1024, 512, ColorUtils.PackColor(255, 255, 255));
-        private List<Sprite> _sprites = new List<Sprite>();
+        public Map Map = new Map();
+        public Player Player = new Player();
+        public Framebuffer<uint> Framebuffer = new Framebuffer<uint>(1024, 512, ColorUtils.PackColor(255, 255, 255));
+        public List<Sprite> Sprites = new List<Sprite>();
 
         private readonly string _directoryName = $"dir-{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}";
 
         private void MapShowSprite(Sprite sprite)
         {
-            var rectW = _framebuffer.Width / (_map.Width * 2); // size of one map cell on the screen
-            var rectH = _framebuffer.Height / _map.Height;
-            _framebuffer.DrawRectangle((int)(sprite.X * rectW - 3), (int)(sprite.Y * rectH - 3), 6, 6, ColorUtils.PackColor(255, 0, 0));
+            var rectW = Framebuffer.Width / (Map.Width * 2); // size of one map cell on the screen
+            var rectH = Framebuffer.Height / Map.Height;
+            Framebuffer.DrawRectangle((int)(sprite.X * rectW - 3), (int)(sprite.Y * rectH - 3), 6, 6, ColorUtils.PackColor(255, 0, 0));
         }
 
         private int WallTextureCoord(float x, float y, Texture wallTexture)
@@ -43,15 +43,15 @@ namespace TinyEverything.TinyRaycasterProject
 
         private void DrawMap(int rectWidth, int rectHeight, Texture texture)
         {
-            for (var j = 0; j < _map.Height; j++)
+            for (var j = 0; j < Map.Height; j++)
             { // draw the map
-                for (var i = 0; i < _map.Width; i++)
+                for (var i = 0; i < Map.Width; i++)
                 {
-                    if (_map.IsEmpty(i, j)) continue; // skip empty spaces
+                    if (Map.IsEmpty(i, j)) continue; // skip empty spaces
                     var rectX = i * rectWidth;
                     var rectY = j * rectHeight;
-                    var textureId = _map[i, j];
-                    _framebuffer.DrawRectangle(rectX, rectY, rectWidth, rectHeight, texture[textureId * texture.Size]);
+                    var textureId = Map[i, j];
+                    Framebuffer.DrawRectangle(rectX, rectY, rectWidth, rectHeight, texture[textureId * texture.Size]);
                 }
             }
         }
@@ -59,29 +59,29 @@ namespace TinyEverything.TinyRaycasterProject
         private void DrawSprite(Sprite sprite, List<float> depthBuffer, Texture texSprites)
         {
             // absolute direction from the player to the sprite (in radians)
-            var spriteDir = MathF.Atan2(sprite.Y - _player.Y, sprite.X - _player.X);
+            var spriteDir = MathF.Atan2(sprite.Y - Player.Y, sprite.X - Player.X);
             // remove unnecessary periods from the relative direction
-            while (spriteDir - _player.A > MathF.PI) spriteDir -= 2 * MathF.PI;
-            while (spriteDir - _player.A < -MathF.PI) spriteDir += 2 * MathF.PI;
+            while (spriteDir - Player.A > MathF.PI) spriteDir -= 2 * MathF.PI;
+            while (spriteDir - Player.A < -MathF.PI) spriteDir += 2 * MathF.PI;
 
             // distance from the player to the sprite
-            var spriteScreenSize = (int)MathF.Min(1000, (int)(_framebuffer.Height / sprite.PlayerDist));
+            var spriteScreenSize = (int)MathF.Min(1000, (int)(Framebuffer.Height / sprite.PlayerDist));
             // do not forget the 3D view takes only a half of the framebuffer, thus fb.Width/2 for the screen width
-            var hOffset = (int)((spriteDir - _player.A) / (_player.FOV) * (_framebuffer.Width / 2) + (_framebuffer.Width / 2) / 2 - texSprites.Size / 2);
-            var vOffset = _framebuffer.Height / 2 - spriteScreenSize / 2;
+            var hOffset = (int)((spriteDir - Player.A) / (Player.FOV) * (Framebuffer.Width / 2) + (Framebuffer.Width / 2) / 2 - texSprites.Size / 2);
+            var vOffset = Framebuffer.Height / 2 - spriteScreenSize / 2;
 
             for (var i = 0; i < spriteScreenSize; i++)
             {
-                if (hOffset + i < 0 || hOffset + i >= _framebuffer.Width / 2) continue;
+                if (hOffset + i < 0 || hOffset + i >= Framebuffer.Width / 2) continue;
                 if (depthBuffer[hOffset + i] < sprite.PlayerDist) continue;
                 for (var j = 0; j < spriteScreenSize; j++)
                 {
-                    if (vOffset + j < 0 || vOffset + j >= _framebuffer.Height) continue;
+                    if (vOffset + j < 0 || vOffset + j >= Framebuffer.Height) continue;
                     var color = texSprites.Get(i * texSprites.Size / spriteScreenSize, j * texSprites.Size / spriteScreenSize, sprite.TextureID);
                     ColorUtils.UnpackColor(color, out _, out _, out _, out var a);
                     if (a > 128)
                     {
-                        _framebuffer.SetPixel(_framebuffer.Width / 2 + hOffset + i, vOffset + j, color);
+                        Framebuffer.SetPixel(Framebuffer.Width / 2 + hOffset + i, vOffset + j, color);
                     }
                 }
             }
@@ -91,61 +91,61 @@ namespace TinyEverything.TinyRaycasterProject
         {
             var texture = new Texture("Resources/walltext.png");
             var monsters = new Texture("Resources/monsters.png");
-            var rectWidth = _framebuffer.Width / (_map.Width * 2);
-            var rectHeight = _framebuffer.Height / _map.Height;
+            var rectWidth = Framebuffer.Width / (Map.Width * 2);
+            var rectHeight = Framebuffer.Height / Map.Height;
 
-            var depthBuffer = Enumerable.Repeat(1e3f, _framebuffer.Width / 2).ToList();
-            _framebuffer.Clear(ColorUtils.PackColor(255, 255, 255));
+            var depthBuffer = Enumerable.Repeat(1e3f, Framebuffer.Width / 2).ToList();
+            Framebuffer.Clear(ColorUtils.PackColor(255, 255, 255));
 
             DrawMap(rectWidth, rectHeight, texture);
 
-            for (var i = 0; i < _framebuffer.Width / 2; i++)
+            for (var i = 0; i < Framebuffer.Width / 2; i++)
             {
                 // draw the visibility cone AND the "3D" view
-                var angle = _player.A - _player.FOV / 2 + _player.FOV * i / ((float)_framebuffer.Width / 2);
+                var angle = Player.A - Player.FOV / 2 + Player.FOV * i / ((float)Framebuffer.Width / 2);
                 for (float t = 0; t < 20; t += 0.01f)
                 {
-                    var x = _player.X + t * MathF.Cos(angle);
-                    var y = _player.Y + t * MathF.Sin(angle);
+                    var x = Player.X + t * MathF.Cos(angle);
+                    var y = Player.Y + t * MathF.Sin(angle);
 
                     var pixX = (int)(x * rectWidth);
                     var pixY = (int)(y * rectHeight);
-                    _framebuffer.SetPixel(pixX, pixY,
+                    Framebuffer.SetPixel(pixX, pixY,
                         ColorUtils.PackColor(160, 160, 160)); // this draws the visibility cone
 
-                    if (_map.IsEmpty((int)x, (int)y)) continue;
+                    if (Map.IsEmpty((int)x, (int)y)) continue;
 
-                    var textureId = _map[(int)x, (int)y];
+                    var textureId = Map[(int)x, (int)y];
                     // our ray touches a wall, so draw the vertical column to create an illusion of 3D
-                    var dist = (t * MathF.Cos(angle - _player.A));
-                    var columnHeight = (int)(_framebuffer.Height / dist);
+                    var dist = (t * MathF.Cos(angle - Player.A));
+                    var columnHeight = (int)(Framebuffer.Height / dist);
                     depthBuffer[i] = dist;
                     var textureCoord = WallTextureCoord(x, y, texture);
 
                     var column = texture.GetScaledColumn(textureId, textureCoord, columnHeight);
-                    pixX = _framebuffer.Width / 2 + i;
+                    pixX = Framebuffer.Width / 2 + i;
                     for (var j = 0; j < columnHeight; j++)
                     {
-                        pixY = j + _framebuffer.Height / 2 - columnHeight / 2;
-                        if (pixY < 0 || pixY >= _framebuffer.Height) continue;
-                        _framebuffer.SetPixel(pixX, pixY, column[j]);
+                        pixY = j + Framebuffer.Height / 2 - columnHeight / 2;
+                        if (pixY < 0 || pixY >= Framebuffer.Height) continue;
+                        Framebuffer.SetPixel(pixX, pixY, column[j]);
                     }
 
                     break;
                 }
             }
 
-            for (var s = 0; s < _sprites.Count; s++)
+            for (var s = 0; s < Sprites.Count; s++)
             { // update the distances from the player to each sprite
-                _sprites[s].PlayerDist = MathF.Sqrt(MathF.Pow(_player.X - _sprites[s].X, 2) + MathF.Pow(_player.Y - _sprites[s].Y, 2));
+                Sprites[s].PlayerDist = MathF.Sqrt(MathF.Pow(Player.X - Sprites[s].X, 2) + MathF.Pow(Player.Y - Sprites[s].Y, 2));
             }
 
-            _sprites.Sort((s1, s2) => (int)(s2.PlayerDist - s1.PlayerDist));
+            Sprites.Sort((s1, s2) => (int)(s2.PlayerDist - s1.PlayerDist));
 
-            for (var s = 0; s < _sprites.Count; s++)
+            for (var s = 0; s < Sprites.Count; s++)
             {
-                MapShowSprite(_sprites[s]);
-                DrawSprite(_sprites[s], depthBuffer, monsters);
+                MapShowSprite(Sprites[s]);
+                DrawSprite(Sprites[s], depthBuffer, monsters);
             }
         }
 
@@ -154,11 +154,11 @@ namespace TinyEverything.TinyRaycasterProject
         {
 
             Directory.CreateDirectory(_directoryName);
-            _player.X = 3.456f; // player x position
-            _player.Y = 2.345f; // player y position
-            _player.A = 1.523f;
-            _player.FOV = MathF.PI / 3.0f;
-            _sprites = new List<Sprite>()
+            Player.X = 3.456f; // player x position
+            Player.Y = 2.345f; // player y position
+            Player.A = 1.523f;
+            Player.FOV = MathF.PI / 3.0f;
+            Sprites = new List<Sprite>()
             {
                 new Sprite(3.523f, 3.812f, 0,2),
                 new Sprite(1.834f, 8.765f, 0,0),
@@ -168,11 +168,11 @@ namespace TinyEverything.TinyRaycasterProject
 
             for (var frame = 0; frame < 360; frame++)
             {
-                _player.A += 2 * MathF.PI / 360f;
+                Player.A += 2 * MathF.PI / 360f;
                 Render();
                 var fileName = $"{frame}.ppm";
 
-                Save(fileName, _framebuffer.Height, _framebuffer.Width, _framebuffer);
+                Save(fileName, Framebuffer.Height, Framebuffer.Width, Framebuffer);
             }
 
 

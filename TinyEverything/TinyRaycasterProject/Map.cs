@@ -1,6 +1,6 @@
 ﻿namespace TinyEverything.TinyRaycasterProject
 {
-    internal class Map
+    public class Map
     {
         public readonly int Width = 16;
         public readonly int Height = 16;

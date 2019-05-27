@@ -1,6 +1,6 @@
 ﻿namespace TinyEverything.TinyRaycasterProject
 {
-    internal static class ColorUtils
+    public static class ColorUtils
     {
         public static uint PackColor(byte r, byte g, byte b, byte a = 255)
         {
