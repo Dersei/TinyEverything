@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
+using System.Runtime.CompilerServices;
 using StbSharp;
 using TinyEverything.Common;
 
 namespace TinyEverything.TinyRaycasterProject
 {
-    internal class Texture
+    public class Texture
     {
         public readonly int Width;
         public readonly int Height;
@@ -35,27 +34,23 @@ namespace TinyEverything.TinyRaycasterProject
                     var g = data[(i + j * image.Width) * 4 + 1];
                     var b = data[(i + j * image.Width) * 4 + 2];
                     var a = data[(i + j * image.Width) * 4 + 3];
-                    Data[i + j * image.Width] = PackColor(r, g, b, a);
+                    Data[i + j * image.Width] = ColorUtils.PackColor(r, g, b, a);
                 }
             }
         }
 
         public uint this[int index] => Data[index];
 
-        private uint PackColor(byte r, byte g, byte b, byte a = 255)
-        {
-            return (((uint)a << 24) + ((uint)b << 16) + ((uint)g << 8) + r);
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint Get(int i, int j, int idx)
         {
             return Data[i + idx * Size + j * Width];
         }
 
-        public List<uint> GetScaledColumn(int textureID, int textureCoord, int columnHeight)
+        public uint[] GetScaledColumn(int textureID, int textureCoord, int columnHeight)
         {
-            var column = Enumerable.Repeat(0u, columnHeight).ToList();
-            for (int y = 0; y < columnHeight; y++)
+            var column = new uint[columnHeight];
+            for (var y = 0; y < columnHeight; y++)
             {
                 column[y] = Get(textureCoord, (y * Size) / columnHeight, textureID);
             }

@@ -1,33 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace TinyEverything.Common
 {
     public class Framebuffer<T> where T : struct
     {
-        private T[] _data;
+        public T[] Data { get; }
         public readonly int Width;
         public readonly int Height;
-        public int Count => _data.Length;
+        public int Count => Data.Length;
 
         public Framebuffer(int width, int height, T value)
         {
             Width = width;
             Height = height;
-            _data = Enumerable.Repeat(value, width * height).ToArray();
+            Data = new T[width * height];
+            Array.Fill(Data, value);
         }
 
-        public void Clear(T value) => _data = Enumerable.Repeat(value, Width * Height).ToArray();
+        public void Clear(T value) => Array.Fill(Data, value);
 
         public T this[int index]
         {
-            get => _data[index];
-            set => _data[index] = value;
+            get => Data[index];
+            set => Data[index] = value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixel(int x, int y, T color)
         {
-            _data[x + y * Width] = color;
+            Data[x + y * Width] = color;
         }
 
         public void DrawRectangle(int x, int y, int width, int height, T color)
@@ -42,11 +44,6 @@ namespace TinyEverything.Common
                         SetPixel(cx, cy, color);
                 }
             }
-        }
-
-        public T[] GetData()
-        {
-            return _data;
         }
     }
 }

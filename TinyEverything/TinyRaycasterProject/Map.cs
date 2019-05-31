@@ -5,7 +5,7 @@
         public readonly int Width = 16;
         public readonly int Height = 16;
 
-        private readonly char[] _map = ("0000222222220000" +
+        private char[] _map = ("0000222222220000" +
                                         "1              0" +
                                         "1      11111   0" +
                                         "1     0        0" +
@@ -27,6 +27,17 @@
         public bool IsEmpty(int i, int j)
         {
             return _map[i + j * Width] == ' ';
+        }
+
+        public void SetMap(char[] array)
+        {
+            _map = array;
+        }
+
+
+        public void SetMap(string array)
+        {
+            _map = array.ToCharArray();
         }
     }
 }

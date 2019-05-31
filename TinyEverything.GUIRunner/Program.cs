@@ -6,9 +6,9 @@ using TinyEverything.TinyRaycasterProject;
 
 namespace TinyEverything.GUIRunner
 {
-    class Program
+    internal class Program
     {
-        static unsafe void Main(string[] args)
+        private static unsafe void Main()
         {
             SDL.SDL_SetHint(SDL.SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
             if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) != 0)
@@ -17,7 +17,7 @@ namespace TinyEverything.GUIRunner
                 return;
             }
 
-            Framebuffer<uint> framebuffer = new Framebuffer<uint>(1024, 512, ColorUtils.PackColor(255, 255, 255));
+            var framebuffer = new Framebuffer<uint>(1024, 512, ColorUtils.PackColor(255, 255, 255));
             var raycaster = new TinyRaycaster()
             {
                 Framebuffer = framebuffer,
@@ -25,7 +25,8 @@ namespace TinyEverything.GUIRunner
                 {
                     X = 3.456f, // player x position
                     Y = 2.345f, // player y position
-                    A = 1.523f
+                    A = 1.523f,
+                    FOV = MathF.PI / 3.0f
                 }
             };
 
@@ -93,35 +94,33 @@ namespace TinyEverything.GUIRunner
                     }
                 }
 
+                raycaster.Player.A += raycaster.Player.Turn * 0.05f; // TODO measure elapsed time and modify the speed accordingly
+                var nx = raycaster.Player.X + raycaster.Player.Walk * MathF.Cos(raycaster.Player.A) * 0.05f;
+                var ny = raycaster.Player.Y + raycaster.Player.Walk * MathF.Sin(raycaster.Player.A) * 0.05f;
+
+                if ((int)nx >= 0 && (int)nx < raycaster.Map.Width && (int)ny >= 0 &&
+                    (int)ny < raycaster.Map.Height)
                 {
-                    raycaster.Player.A += raycaster.Player.Turn * 0.05f; // TODO measure elapsed time and modify the speed accordingly
-                    var nx = raycaster.Player.X + raycaster.Player.Walk * MathF.Cos(raycaster.Player.A) * 0.05f;
-                    var ny = raycaster.Player.Y + raycaster.Player.Walk * MathF.Sin(raycaster.Player.A) * 0.05f;
-
-                    if ((int)nx >= 0 && (int)nx < raycaster.Map.Width && (int)ny >= 0 &&
-                        (int)ny < raycaster.Map.Height)
-                    {
-                        if (raycaster.Map.IsEmpty((int)nx, (int)raycaster.Player.Y)) raycaster.Player.X = nx;
-                        if (raycaster.Map.IsEmpty((int)raycaster.Player.X, (int)ny)) raycaster.Player.Y = ny;
-                    }
-
-                    for (var i = 0; i < raycaster.Sprites.Count; i++)
-                    {
-                        // update the distances from the player to each sprite
-                        raycaster.Sprites[i].PlayerDist =
-                            MathF.Sqrt(MathF.Pow(raycaster.Player.X - raycaster.Sprites[i].X, 2) +
-                                       MathF.Pow(raycaster.Player.Y - raycaster.Sprites[i].Y, 2));
-                    }
-
-                    raycaster.Sprites.Sort((s1, s2) => (int)(s2.PlayerDist - s1.PlayerDist));
+                    if (raycaster.Map.IsEmpty((int)nx, (int)raycaster.Player.Y)) raycaster.Player.X = nx;
+                    if (raycaster.Map.IsEmpty((int)raycaster.Player.X, (int)ny)) raycaster.Player.Y = ny;
                 }
 
+                for (var i = 0; i < raycaster.Sprites.Count; i++)
+                {
+                    // update the distances from the player to each sprite
+                    raycaster.Sprites[i].PlayerDist =
+                        MathF.Sqrt(MathF.Pow(raycaster.Player.X - raycaster.Sprites[i].X, 2) +
+                                   MathF.Pow(raycaster.Player.Y - raycaster.Sprites[i].Y, 2));
+                }
+
+                raycaster.Sprites.Sort((s1, s2) => (int)(s2.PlayerDist - s1.PlayerDist));
+
                 raycaster.Run();
-                uint[] buffer = new uint[framebuffer.GetData().Length];
-                Array.Copy(framebuffer.GetData(), buffer, buffer.Length);
+                var buffer = new uint[framebuffer.Data.Length];
+                Array.Copy(framebuffer.Data, buffer, buffer.Length);
                 fixed (uint* p = buffer)
                 {
-                    IntPtr ptr = (IntPtr)p;
+                    var ptr = (IntPtr)p;
                     SDL.SDL_UpdateTexture(texture, IntPtr.Zero, ptr, framebuffer.Width * 4);
                     SDL.SDL_RenderClear(renderer);
                     SDL.SDL_RenderCopy(renderer, texture, IntPtr.Zero, IntPtr.Zero);

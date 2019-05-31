@@ -19,8 +19,8 @@ namespace TinyEverything.TinyRaycasterProject
             new Sprite(5.323f, 5.365f, 0,1),
             new Sprite(4.123f, 10.265f, 0,1),
         };
-
-        private readonly string _directoryName = $"dir-{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}";
+        public Texture WallTexture = new Texture("Resources/walltext.png");
+        public Texture SpritesTexture = new Texture("Resources/monsters.png");
 
         private void MapShowSprite(Sprite sprite)
         {
@@ -29,25 +29,25 @@ namespace TinyEverything.TinyRaycasterProject
             Framebuffer.DrawRectangle((int)(sprite.X * rectW - 3), (int)(sprite.Y * rectH - 3), 6, 6, ColorUtils.PackColor(255, 0, 0));
         }
 
-        private int WallTextureCoord(float x, float y, Texture wallTexture)
+        private int WallTextureCoord(float x, float y)
         {
             var hitX = x - MathF.Floor(x + 0.5f);
             var hitY = y - MathF.Floor(y + 0.5f);
-            var texture = (int)(hitX * wallTexture.Size);
+            var texture = (int)(hitX * WallTexture.Size);
             if (MathF.Abs(hitY) > MathF.Abs(hitX))
             {
-                texture = (int)(hitY * wallTexture.Size);
+                texture = (int)(hitY * WallTexture.Size);
             }
 
             if (texture < 0)
             {
-                texture += wallTexture.Size;
+                texture += WallTexture.Size;
             }
 
             return texture;
         }
 
-        private void DrawMap(int rectWidth, int rectHeight, Texture texture)
+        private void DrawMap(int rectWidth, int rectHeight)
         {
             for (var j = 0; j < Map.Height; j++)
             { // draw the map
@@ -57,12 +57,12 @@ namespace TinyEverything.TinyRaycasterProject
                     var rectX = i * rectWidth;
                     var rectY = j * rectHeight;
                     var textureId = Map[i, j];
-                    Framebuffer.DrawRectangle(rectX, rectY, rectWidth, rectHeight, texture[textureId * texture.Size]);
+                    Framebuffer.DrawRectangle(rectX, rectY, rectWidth, rectHeight, WallTexture[textureId * WallTexture.Size]);
                 }
             }
         }
 
-        private void DrawSprite(Sprite sprite, List<float> depthBuffer, Texture texSprites)
+        private void DrawSprite(Sprite sprite, List<float> depthBuffer)
         {
             // absolute direction from the player to the sprite (in radians)
             var spriteDir = MathF.Atan2(sprite.Y - Player.Y, sprite.X - Player.X);
@@ -73,7 +73,7 @@ namespace TinyEverything.TinyRaycasterProject
             // distance from the player to the sprite
             var spriteScreenSize = (int)MathF.Min(1000, (int)(Framebuffer.Height / sprite.PlayerDist));
             // do not forget the 3D view takes only a half of the framebuffer, thus fb.Width/2 for the screen width
-            var hOffset = (int)((spriteDir - Player.A) / (Player.FOV) * (Framebuffer.Width / 2) + (Framebuffer.Width / 2) / 2 - texSprites.Size / 2);
+            var hOffset = (int)((spriteDir - Player.A) / Player.FOV * (Framebuffer.Width / 2) + Framebuffer.Width / 4 - SpritesTexture.Size / 2);
             var vOffset = Framebuffer.Height / 2 - spriteScreenSize / 2;
 
             for (var i = 0; i < spriteScreenSize; i++)
@@ -83,7 +83,7 @@ namespace TinyEverything.TinyRaycasterProject
                 for (var j = 0; j < spriteScreenSize; j++)
                 {
                     if (vOffset + j < 0 || vOffset + j >= Framebuffer.Height) continue;
-                    var color = texSprites.Get(i * texSprites.Size / spriteScreenSize, j * texSprites.Size / spriteScreenSize, sprite.TextureID);
+                    var color = SpritesTexture.Get(i * SpritesTexture.Size / spriteScreenSize, j * SpritesTexture.Size / spriteScreenSize, sprite.TextureID);
                     ColorUtils.UnpackColor(color, out _, out _, out _, out var a);
                     if (a > 128)
                     {
@@ -92,17 +92,32 @@ namespace TinyEverything.TinyRaycasterProject
                 }
             }
         }
+
+        private void DrawSprites(List<float> depthBuffer, Texture monsters)
+        {
+            for (var s = 0; s < Sprites.Count; s++)
+            { // update the distances from the player to each sprite
+                Sprites[s].PlayerDist = MathF.Sqrt(MathF.Pow(Player.X - Sprites[s].X, 2) + MathF.Pow(Player.Y - Sprites[s].Y, 2));
+            }
+
+            Sprites.Sort((s1, s2) => (int)(s2.PlayerDist - s1.PlayerDist));
+
+            for (var s = 0; s < Sprites.Count; s++)
+            {
+                MapShowSprite(Sprites[s]);
+                DrawSprite(Sprites[s], depthBuffer);
+            }
+        }
+
         private void Render()
         {
-            var texture = new Texture("Resources/walltext.png");
-            var monsters = new Texture("Resources/monsters.png");
             var rectWidth = Framebuffer.Width / (Map.Width * 2);
             var rectHeight = Framebuffer.Height / Map.Height;
 
             var depthBuffer = Enumerable.Repeat(1e3f, Framebuffer.Width / 2).ToList();
             Framebuffer.Clear(ColorUtils.PackColor(255, 255, 255));
 
-            DrawMap(rectWidth, rectHeight, texture);
+            DrawMap(rectWidth, rectHeight);
 
             for (var i = 0; i < Framebuffer.Width / 2; i++)
             {
@@ -115,8 +130,7 @@ namespace TinyEverything.TinyRaycasterProject
 
                     var pixX = (int)(x * rectWidth);
                     var pixY = (int)(y * rectHeight);
-                    Framebuffer.SetPixel(pixX, pixY,
-                        ColorUtils.PackColor(160, 160, 160)); // this draws the visibility cone
+                    Framebuffer.SetPixel(pixX, pixY, ColorUtils.PackColor(160, 160, 160)); // this draws the visibility cone
 
                     if (Map.IsEmpty((int)x, (int)y)) continue;
 
@@ -125,9 +139,9 @@ namespace TinyEverything.TinyRaycasterProject
                     var dist = (t * MathF.Cos(angle - Player.A));
                     var columnHeight = (int)(Framebuffer.Height / dist);
                     depthBuffer[i] = dist;
-                    var textureCoord = WallTextureCoord(x, y, texture);
+                    var textureCoord = WallTextureCoord(x, y);
 
-                    var column = texture.GetScaledColumn(textureId, textureCoord, columnHeight);
+                    var column = WallTexture.GetScaledColumn(textureId, textureCoord, columnHeight);
                     pixX = Framebuffer.Width / 2 + i;
                     for (var j = 0; j < columnHeight; j++)
                     {
@@ -140,43 +154,23 @@ namespace TinyEverything.TinyRaycasterProject
                 }
             }
 
-            for (var s = 0; s < Sprites.Count; s++)
-            { // update the distances from the player to each sprite
-                Sprites[s].PlayerDist = MathF.Sqrt(MathF.Pow(Player.X - Sprites[s].X, 2) + MathF.Pow(Player.Y - Sprites[s].Y, 2));
-            }
+            DrawSprites(depthBuffer, SpritesTexture);
 
-            Sprites.Sort((s1, s2) => (int)(s2.PlayerDist - s1.PlayerDist));
-
-            for (var s = 0; s < Sprites.Count; s++)
-            {
-                MapShowSprite(Sprites[s]);
-                DrawSprite(Sprites[s], depthBuffer, monsters);
-            }
         }
 
-
-        public void Run()
+        public void Run(bool toFile = false)
         {
-
-            //Directory.CreateDirectory(_directoryName);
-
-            Player.FOV = MathF.PI / 3.0f;
-            //for (var frame = 0; frame < 360; frame++)
-            //{
-            //    Player.A += 2 * MathF.PI / 360f;
-            //    Render();
-            //    var fileName = $"{frame}.ppm";
-
-            //    Save(fileName, Framebuffer.Height, Framebuffer.Width, Framebuffer);
-            //}
             Render();
-
-
+            if (toFile)
+            {
+                var fileName = $"{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}.ppm";
+                Save(fileName, Framebuffer.Height, Framebuffer.Width, Framebuffer);
+            }
         }
 
         public void Save(string fileName, int height, int width, Framebuffer<uint> data)
         {
-            using var fileStream = File.Open($"{_directoryName}\\{fileName}", FileMode.CreateNew, FileAccess.Write);
+            using var fileStream = File.Open(fileName, FileMode.CreateNew, FileAccess.Write);
             using var writer = new BinaryWriter(fileStream, Encoding.ASCII);
             writer.Write(Encoding.ASCII.GetBytes($"P6 {width} {height} 255 ")); // trailing space!!!
 
@@ -186,7 +180,6 @@ namespace TinyEverything.TinyRaycasterProject
                 writer.Write(r);
                 writer.Write(g);
                 writer.Write(b);
-                //writer.Write(a);
             }
         }
     }

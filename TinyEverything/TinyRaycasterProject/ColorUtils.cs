@@ -1,12 +1,16 @@
-﻿namespace TinyEverything.TinyRaycasterProject
+﻿using System.Runtime.CompilerServices;
+
+namespace TinyEverything.TinyRaycasterProject
 {
     public static class ColorUtils
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint PackColor(byte r, byte g, byte b, byte a = 255)
         {
             return (((uint)a << 24) + ((uint)b << 16) + ((uint)g << 8) + r);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void UnpackColor(uint color, out byte r, out byte g, out byte b, out byte a)
         {
             r = (byte)((color >> 0) & 255);
