@@ -5,19 +5,19 @@ namespace TinyEverything.Common
 {
     public class Framebuffer<T> where T : struct
     {
-        private List<T> _data;
+        private T[] _data;
         public readonly int Width;
         public readonly int Height;
-        public int Count => _data.Count;
+        public int Count => _data.Length;
 
         public Framebuffer(int width, int height, T value)
         {
             Width = width;
             Height = height;
-            _data = Enumerable.Repeat(value, width * height).ToList();
+            _data = Enumerable.Repeat(value, width * height).ToArray();
         }
 
-        public void Clear(T value) => _data = Enumerable.Repeat(value, Width * Height).ToList();
+        public void Clear(T value) => _data = Enumerable.Repeat(value, Width * Height).ToArray();
 
         public T this[int index]
         {
@@ -42,6 +42,11 @@ namespace TinyEverything.Common
                         SetPixel(cx, cy, color);
                 }
             }
+        }
+
+        public T[] GetData()
+        {
+            return _data;
         }
     }
 }

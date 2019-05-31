@@ -6,5 +6,7 @@
         public float Y;
         public float A;
         public float FOV;
+        public int Turn;
+        public int Walk;
     }
 }

@@ -12,7 +12,13 @@ namespace TinyEverything.TinyRaycasterProject
         public Map Map = new Map();
         public Player Player = new Player();
         public Framebuffer<uint> Framebuffer = new Framebuffer<uint>(1024, 512, ColorUtils.PackColor(255, 255, 255));
-        public List<Sprite> Sprites = new List<Sprite>();
+        public List<Sprite> Sprites = new List<Sprite>
+        {
+            new Sprite(3.523f, 3.812f, 0,2),
+            new Sprite(1.834f, 8.765f, 0,0),
+            new Sprite(5.323f, 5.365f, 0,1),
+            new Sprite(4.123f, 10.265f, 0,1),
+        };
 
         private readonly string _directoryName = $"dir-{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}";
 
@@ -86,7 +92,6 @@ namespace TinyEverything.TinyRaycasterProject
                 }
             }
         }
-
         private void Render()
         {
             var texture = new Texture("Resources/walltext.png");
@@ -153,27 +158,18 @@ namespace TinyEverything.TinyRaycasterProject
         public void Run()
         {
 
-            Directory.CreateDirectory(_directoryName);
-            Player.X = 3.456f; // player x position
-            Player.Y = 2.345f; // player y position
-            Player.A = 1.523f;
+            //Directory.CreateDirectory(_directoryName);
+
             Player.FOV = MathF.PI / 3.0f;
-            Sprites = new List<Sprite>()
-            {
-                new Sprite(3.523f, 3.812f, 0,2),
-                new Sprite(1.834f, 8.765f, 0,0),
-                new Sprite(5.323f, 5.365f, 0,1),
-                new Sprite(4.123f, 10.265f, 0,1),
-            };
+            //for (var frame = 0; frame < 360; frame++)
+            //{
+            //    Player.A += 2 * MathF.PI / 360f;
+            //    Render();
+            //    var fileName = $"{frame}.ppm";
 
-            for (var frame = 0; frame < 360; frame++)
-            {
-                Player.A += 2 * MathF.PI / 360f;
-                Render();
-                var fileName = $"{frame}.ppm";
-
-                Save(fileName, Framebuffer.Height, Framebuffer.Width, Framebuffer);
-            }
+            //    Save(fileName, Framebuffer.Height, Framebuffer.Width, Framebuffer);
+            //}
+            Render();
 
 
         }
