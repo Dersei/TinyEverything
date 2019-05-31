@@ -160,7 +160,18 @@ namespace TinyEverything.TinyRaycasterProject
 
         public void Run(bool toFile = false)
         {
+            Player.A += Player.Turn * 0.05f; // TODO measure elapsed time and modify the speed accordingly
+            var newX = Player.X + Player.Walk * MathF.Cos(Player.A) * 0.05f;
+            var newY = Player.Y + Player.Walk * MathF.Sin(Player.A) * 0.05f;
+
+            if ((int)newX >= 0 && (int)newX < Map.Width && (int)newY >= 0 && (int)newY < Map.Height)
+            {
+                if (Map.IsEmpty((int)newX, (int)Player.Y)) Player.X = newX;
+                if (Map.IsEmpty((int)Player.X, (int)newY)) Player.Y = newY;
+            }
+
             Render();
+
             if (toFile)
             {
                 var fileName = $"{DateTime.Now:yyyy-dd-M--HH-mm-ss.fff}.ppm";
