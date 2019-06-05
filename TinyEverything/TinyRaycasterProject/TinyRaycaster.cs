@@ -93,7 +93,7 @@ namespace TinyEverything.TinyRaycasterProject
             }
         }
 
-        private void DrawSprites(List<float> depthBuffer, Texture monsters)
+        private void DrawSprites(List<float> depthBuffer)
         {
             for (var s = 0; s < Sprites.Count; s++)
             { // update the distances from the player to each sprite
@@ -154,7 +154,7 @@ namespace TinyEverything.TinyRaycasterProject
                 }
             }
 
-            DrawSprites(depthBuffer, SpritesTexture);
+            DrawSprites(depthBuffer);
 
         }
 

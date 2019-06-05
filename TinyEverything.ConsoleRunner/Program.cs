@@ -1,6 +1,7 @@
 ﻿using TinyEverything.TinyKaboomProject;
 using TinyEverything.TinyRaycasterProject;
 using TinyEverything.TinyRaytracerProject;
+using TinyEverything.TinyRendererProject;
 
 namespace TinyEverything.ConsoleRunner
 {
@@ -9,7 +10,7 @@ namespace TinyEverything.ConsoleRunner
         private static void Main()
         {
             //new TinyRaytracer().DefaultSettings().Run();
-            new TinyRaycaster().Run();
+            new TinyRenderer().Run();
         }
     }
 }

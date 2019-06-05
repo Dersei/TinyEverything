@@ -10,7 +10,7 @@ namespace TinyEverything.Common
     internal class Model
     {
         public List<Vector3> Vertices { get; } = new List<Vector3>();
-        public List<Vector<int>> Faces { get; } = new List<Vector<int>>();
+        public List<int[]> Faces { get; } = new List<int[]>();
 
         public Model(string filename)
         {
@@ -24,13 +24,13 @@ namespace TinyEverything.Common
                 }
                 else if (line.StartsWith("v "))
                 {
-                    var array = line.Split(" ").Select(v => float.Parse(v, CultureInfo.InvariantCulture)).ToArray();
+                    var array = line.Split(" ").Skip(1).Select(v => float.Parse(v, CultureInfo.InvariantCulture)).ToArray();
                     Vertices.Add(new Vector3(array[0], array[1], array[2]));
                 }
                 else if (line.StartsWith("f "))
                 {
-                    var array = line.Split(" ").Select(int.Parse).Select(f => --f).ToArray();
-                    Faces.Add(new Vector<int>(array));
+                    var array = line.Split(" ").Skip(1).Select(fvn => fvn.Split('/')[0]).Select(int.Parse).Select(f => --f).ToArray();
+                    Faces.Add(array);
                 }
             }
             //GetBbox(new Vector3(), new Vector3());
