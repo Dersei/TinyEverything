@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 
 namespace TinyEverything.TinyRendererProject
 {
@@ -84,7 +83,7 @@ namespace TinyEverything.TinyRendererProject
             return other.X.Equals(X) && other.Y.Equals(Y);
         }
 
-        public string ToString(string format, IFormatProvider formatProvider = null)
+        public string ToString(string? format, IFormatProvider? formatProvider = null)
         {
             return $"[{X}, {Y}] {typeof(T)}";
         }

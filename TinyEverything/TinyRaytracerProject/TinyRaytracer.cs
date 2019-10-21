@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -12,14 +11,15 @@ namespace TinyEverything.TinyRaytracerProject
     {
         public List<Sphere> Spheres { get; set; } = new List<Sphere>();
         public List<Light> Lights { get; set; } = new List<Light>();
+        public BaseSettings BaseSettings { get; set; } = new BaseSettings(1024, 768);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Vector3 Reflect(Vector3 first, Vector3 second)
+        private static Vector3 Reflect(Vector3 first, Vector3 second)
         {
             return first - second * 2.0f * Vector3.Dot(first, second);
         }
 
-        private Vector3 Refract(Vector3 origin, Vector3 n, float refractiveIndex)
+        private static Vector3 Refract(Vector3 origin, Vector3 n, float refractiveIndex)
         { // Snell's law
             var cosOrigin = -MathF.Max(-1.0f, MathF.Min(1.0f, Vector3.Dot(origin, n)));
             var etaI = 1f;
@@ -73,7 +73,7 @@ namespace TinyEverything.TinyRaytracerProject
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Vector3 Perturb(Vector3 target, Vector3 point, Vector3 n)
+        private static Vector3 Perturb(Vector3 target, Vector3 point, Vector3 n)
         {
             return Vector3.Dot(target, n) < 0 ? point - n * 1e-3f : point + n * 1e-3f;
         }
@@ -105,7 +105,7 @@ namespace TinyEverything.TinyRaytracerProject
         {
             if (depth > 4 || !IsSceneIntersecting(origin, direction, out var point, out var n, out var material))
             {
-                return new Vector3(0.2f, 0.7f, 0.8f); // background color
+                return BaseSettings.BackgroundColor; // background color
             }
 
             var reflectDir = Reflect(direction, n).Normalize();
@@ -151,8 +151,8 @@ namespace TinyEverything.TinyRaytracerProject
 
         public void Run()
         {
-            const int width = 1024;
-            const int height = 768;
+            var width = BaseSettings.Width;
+            var height = BaseSettings.Height;
             const int fov = (int)(MathF.PI / 2.0f);
             var framebuffer = new Framebuffer<Vector3>(width, height, default);
 

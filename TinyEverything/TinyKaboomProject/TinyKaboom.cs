@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using TinyEverything.Common;
-using static TinyEverything.Common.Utilities;
 
 namespace TinyEverything.TinyKaboomProject
 {
@@ -12,6 +10,7 @@ namespace TinyEverything.TinyKaboomProject
         public float SphereRadius { set; get; }
         public float NoiseAmplitude { set; get; }
         public NoiseGenerator NoiseGenerator { get; set; } = new NoiseGenerator();
+        public BaseSettings BaseSettings { get; set; } = new BaseSettings(640, 480);
 
         public TinyKaboom(float sphereRadius = 1.5f, float noiseAmplitude = 1.0f)
         {
@@ -71,11 +70,13 @@ namespace TinyEverything.TinyKaboomProject
             return false;
         }
 
+
         public void Run()
         {
-            const int width = 640;
-            const int height = 480;
+            var width = BaseSettings.Width;
+            var height = BaseSettings.Height;
             const float fov = MathF.PI / 3.0f;
+            var origin = new Vector3(0, 0, 3);
             var framebuffer = new Framebuffer<Vector3>(width, height, default);
 
             Parallel.For(0, height, j =>
@@ -86,7 +87,7 @@ namespace TinyEverything.TinyKaboomProject
                      var dirY = -(j + 0.5f) + height / 2.0f;    // this flips the image at the same time
                      var dirZ = -height / (2.0f * MathF.Tan(fov / 2.0f));
 
-                     if (SphereTrace(new Vector3(0, 0, 3), new Vector3(dirX, dirY, dirZ).Normalize(), out var hit))
+                     if (SphereTrace(origin, new Vector3(dirX, dirY, dirZ).Normalize(), out var hit))
                      { // the camera is placed to (0,0,3) and it looks along the -z axis
                          var noiseLevel = (SphereRadius - hit.Length()) / NoiseAmplitude;
                          var lightDir = (new Vector3(10, 10, 10) - hit).Normalize();
@@ -95,7 +96,7 @@ namespace TinyEverything.TinyKaboomProject
                      }
                      else
                      {
-                         framebuffer[i + j * width] = new Vector3(0.2f, 0.7f, 0.8f); // background color
+                         framebuffer[i + j * width] = BaseSettings.BackgroundColor; // background color
                      }
                  }
              });

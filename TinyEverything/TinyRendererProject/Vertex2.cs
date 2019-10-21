@@ -46,7 +46,7 @@ namespace TinyEverything.TinyRendererProject
             return other.X == X && other.Y == Y;
         }
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
         {
             return $"[{X}, {Y}]";
         }

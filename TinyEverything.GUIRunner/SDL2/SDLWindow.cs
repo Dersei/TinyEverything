@@ -48,7 +48,7 @@ namespace TinyEverything.GUIRunner.SDL2
         private static extern int SDL_SetHint(byte[] name, byte[] value);
         private bool SetHint()
         {
-            return SDL_SetHint(UTF8ToNative("SDL_WINDOWS_DISABLE_THREAD_NAMING"), UTF8ToNative("1")) == 1;
+            return SDL_SetHint(UTF8ToNative("SDL_WINDOWS_DISABLE_THREAD_NAMING")!, UTF8ToNative("1")!) == 1;
         }
 
         /* window refers to an SDL_Window* */
@@ -125,12 +125,12 @@ namespace TinyEverything.GUIRunner.SDL2
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         private static extern void SDL_RenderPresent(IntPtr renderer);
 
-        private static byte[] UTF8ToNative(string s)
+        private static byte[]? UTF8ToNative(string s)
         {
             return s == null ? null : System.Text.Encoding.UTF8.GetBytes(s + '\0');
         }
 
-        private static unsafe string UTF8ToManaged(IntPtr s)
+        private static unsafe string? UTF8ToManaged(IntPtr s)
         {
             if (s == IntPtr.Zero)
             {
@@ -151,7 +151,7 @@ namespace TinyEverything.GUIRunner.SDL2
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr SDL_GetError();
-        public string GetError()
+        public string? GetError()
         {
             return UTF8ToManaged(SDL_GetError());
         }

@@ -35,9 +35,7 @@ namespace TinyEverything.GUIRunner.SDL2
         private const string NativeLibName = "SDL2";
 
         #endregion
-
-
-
+        
         #region SDL_events.h
 
         /* The types of events that can be delivered. */
