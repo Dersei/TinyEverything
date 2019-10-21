@@ -13,7 +13,7 @@ namespace TinyEverything.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static float Lerp(float first, float second, float value)
+        public static float Lerp(float first, float second, float value)
         {
             return first + (second - first) * MathF.Max(0.0f, MathF.Min(1.0f, value));
         }

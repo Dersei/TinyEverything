@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace TinyEverything.TinyRaycasterProject
+namespace TinyEverything.Raycaster
 {
     public static class ColorUtils
     {

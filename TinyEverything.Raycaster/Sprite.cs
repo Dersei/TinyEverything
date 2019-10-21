@@ -1,4 +1,4 @@
-﻿namespace TinyEverything.TinyRaycasterProject
+﻿namespace TinyEverything.Raycaster
 {
     public class Sprite
     {

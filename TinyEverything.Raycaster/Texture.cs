@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using StbSharp;
 using TinyEverything.Common;
 
-namespace TinyEverything.TinyRaycasterProject
+namespace TinyEverything.Raycaster
 {
     public class Texture
     {

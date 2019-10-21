@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TinyEverything.TinyRendererProject
+namespace TinyEverything.Renderer
 {
     public struct Vertex2 : IEquatable<Vertex2>, IFormattable
     {

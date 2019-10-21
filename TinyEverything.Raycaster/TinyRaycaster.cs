@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using TinyEverything.Common;
 
-namespace TinyEverything.TinyRaycasterProject
+namespace TinyEverything.Raycaster
 {
     public class TinyRaycaster
     {

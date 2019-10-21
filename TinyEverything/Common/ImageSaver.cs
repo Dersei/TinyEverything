@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TinyEverything.Common
 {
-    internal static class ImageSaver
+    public static class ImageSaver
     {
         public static void Save(Image image)
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace TinyEverything.TinyRendererProject
+namespace TinyEverything.Renderer
 {
     internal enum Format
     {

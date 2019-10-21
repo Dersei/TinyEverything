@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Numerics;
 using TinyEverything.Common;
-using TinyEverything.TinyKaboomProject;
-using TinyEverything.TinyRaytracerProject;
-using TinyEverything.TinyRendererProject;
+using TinyEverything.Kaboom;
+using TinyEverything.Raytracer;
+using TinyEverything.Renderer;
 
 namespace TinyEverything.ConsoleRunner
 {

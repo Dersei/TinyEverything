@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TinyEverything\TinyEverything.csproj" />
+    <ProjectReference Include="..\TinyEverything.Kaboom\TinyEverything.Kaboom.csproj" />
+    <ProjectReference Include="..\TinyEverything.Raytracer\TinyEverything.Raytracer.csproj" />
+    <ProjectReference Include="..\TinyEverything.Renderer\TinyEverything.Renderer.csproj" />
   </ItemGroup>
 
 </Project>

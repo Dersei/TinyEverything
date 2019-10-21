@@ -1,16 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <StartupObject></StartupObject>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
-    <ApplicationIcon />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StbSharp" Version="0.7.2.38" />
+    <ProjectReference Include="..\TinyEverything\TinyEverything.csproj" />
   </ItemGroup>
 
 </Project>
