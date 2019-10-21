@@ -1,19 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TinyEverything.Raycaster\TinyEverything.Raycaster.csproj" />
+    <ProjectReference Include="..\TinyEverything\TinyEverything.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="SDL2.dll">
+    <None Update="Resources\african_head.obj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

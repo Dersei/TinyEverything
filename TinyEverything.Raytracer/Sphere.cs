@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace TinyEverything.TinyRaytracerProject
+namespace TinyEverything.Raytracer
 {
     public readonly struct Sphere
     {

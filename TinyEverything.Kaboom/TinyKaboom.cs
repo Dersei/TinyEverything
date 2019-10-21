@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using TinyEverything.Common;
 
-namespace TinyEverything.TinyKaboomProject
+namespace TinyEverything.Kaboom
 {
     public class TinyKaboom
     {

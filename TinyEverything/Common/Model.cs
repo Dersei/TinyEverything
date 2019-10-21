@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace TinyEverything.Common
 {
-    internal class Model
+    public class Model
     {
         public List<Vector3> Vertices { get; } = new List<Vector3>();
         public List<int[]> Faces { get; } = new List<int[]>();

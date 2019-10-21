@@ -2,7 +2,7 @@
 using System.Threading;
 using TinyEverything.Common;
 using TinyEverything.GUIRunner.SDL2;
-using TinyEverything.TinyRaycasterProject;
+using TinyEverything.Raycaster;
 using static TinyEverything.GUIRunner.SDL2.SDLEvents;
 
 namespace TinyEverything.GUIRunner

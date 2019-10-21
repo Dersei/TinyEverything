@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TinyEverything.Common;
 
-namespace TinyEverything.TinyRaytracerProject
+namespace TinyEverything.Raytracer
 {
     public class TinyRaytracer
     {

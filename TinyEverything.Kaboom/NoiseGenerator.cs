@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using static TinyEverything.Common.Utilities;
 
-namespace TinyEverything.TinyKaboomProject
+namespace TinyEverything.Kaboom
 {
     public class NoiseGenerator
     {
